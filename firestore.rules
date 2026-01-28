@@ -1,0 +1,15 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Rules for the 'monthly_data' collection
+    match /monthly_data/{month} {
+      // Anyone can read the result chart data.
+      allow read: if true;
+
+      // Only authenticated (logged-in) users can write, update, or delete data.
+      // This protects your data from being changed by random users.
+      allow write, update, delete: if request.auth != null;
+    }
+  }
+}
