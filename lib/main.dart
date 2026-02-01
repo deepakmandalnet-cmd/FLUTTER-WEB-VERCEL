@@ -330,7 +330,7 @@ By using this website, you agree that you are accessing the content at your own 
                       maxLines: _isDisclaimerExpanded ? null : 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 12,
                         fontStyle: FontStyle.italic,
                         color: Colors.grey.shade700,
                       ),
@@ -373,7 +373,7 @@ By using this website, you agree that you are accessing the content at your own 
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Text(
-                      'PLAY NIGHT BAZZAR',
+                      'PLAY BAZZAR',
                       style: GoogleFonts.oswald(
                         color: Theme.of(context).colorScheme.primary,
                         fontSize: 32,
@@ -610,7 +610,7 @@ class AdminScreen extends StatefulWidget {
 class _AdminScreenState extends State<AdminScreen> {
   // For Form
   final _formKey = GlobalKey<FormState>();
-  final List<String> _playerNames = ['Anil', 'Sunil', 'Raju', 'Suresh', 'Ramesh', 'Vikas', 'Prakash'];
+  final List<String> _playerNames = ['Disawar', 'Night bazzar', 'CC colony', 'Faridabad', 'Delhi night', 'Gaziabad', 'Gali'];
   String? _selectedPlayer;
   DateTime _selectedDate = DateTime.now();
   final _numberController = TextEditingController();
