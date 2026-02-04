@@ -1,6 +1,6 @@
 {
-  "installCommand": "echo 'Cloning Flutter...' && git clone https://github.com/flutter/flutter.git --depth 1 -b stable /flutter && echo 'Running flutter doctor...' && /flutter/bin/flutter doctor && echo 'Getting dependencies...' && /flutter/bin/flutter pub get && echo 'Building Flutter web app...' && /flutter/bin/flutter build web --release",
-  "buildCommand": "echo 'Build complete.'",
+  "installCommand": "chmod +x setup.sh && ./setup.sh",
+  "buildCommand": "echo 'Build artifacts were created during the install phase.'",
   "outputDirectory": "build/web",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
