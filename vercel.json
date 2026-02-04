@@ -1,5 +1,5 @@
 {
-  "installCommand": "chmod +x build.sh && ./build.sh",
+  "installCommand": "echo 'Listing files...' && ls -la && echo 'Attempting to run build script...' && chmod +x build.sh && ./build.sh",
   "buildCommand": "echo 'Build artifacts were created during the install phase.'",
   "outputDirectory": "build/web",
   "rewrites": [
