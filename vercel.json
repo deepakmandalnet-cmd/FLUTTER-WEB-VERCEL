@@ -4,8 +4,7 @@
       "src": "pubspec.yaml",
       "use": "@vercel/static-build",
       "config": {
-        "installCommand": "git clone https://github.com/flutter/flutter.git --depth 1 --branch stable /tmp/flutter && /tmp/flutter/bin/flutter pub get",
-        "buildCommand": "/tmp/flutter/bin/flutter build web --release",
+        "installCommand": "chmod +x build.sh && ./build.sh",
         "outputDirectory": "build/web"
       }
     }

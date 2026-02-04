@@ -1,31 +1,23 @@
 #!/bin/bash
 
-# Print each command before executing it
-set -x
-# Exit immediately if a command exits with a non-zero status.
+# Exit on error
 set -e
 
-echo "--- Starting Build Script ---"
+# 1. Install Flutter SDK
+echo "Cloning Flutter repository..."
+git clone https://github.com/flutter/flutter.git --depth 1 --branch 3.22.2 /tmp/flutter
 
-echo "--- Installing Flutter ---"
-if [ ! -d "flutter" ]; then
-  git clone https://github.com/flutter/flutter.git --depth 1 -b stable
-fi
+# 2. Add Flutter to PATH
+export PATH="/tmp/flutter/bin:$PATH"
 
-echo "--- Setting Flutter Path ---"
-export PATH="$PATH:`pwd`/flutter/bin"
-
-echo "--- Running flutter doctor -v ---"
+# 3. Run flutter doctor
+echo "Running flutter doctor..."
 flutter doctor -v
 
-echo "--- Enabling Flutter web ---"
-flutter config --enable-web
-
-echo "--- Getting dependencies ---"
+# 4. Get dependencies
+echo "Running flutter pub get..."
 flutter pub get
 
-echo "--- Building Flutter web app ---"
+# 5. Build the web app
+echo "Building Flutter web app..."
 flutter build web --release
-
-echo "--- Build finished successfully. Output is in build/web ---"
-ls -la build/web
