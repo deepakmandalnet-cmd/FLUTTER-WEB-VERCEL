@@ -33,7 +33,7 @@ class _AdminScreenState extends State<AdminScreen> {
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: _firestore.collection('games').snapshots(),
+        stream: _firestore.collection('monthly_data').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
@@ -44,7 +44,7 @@ class _AdminScreenState extends State<AdminScreen> {
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('No data found in the "games" collection.'));
+            return const Center(child: Text('No data found in the "monthly_data" collection.'));
           }
 
           final docs = snapshot.data!.docs;

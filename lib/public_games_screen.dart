@@ -17,12 +17,12 @@ class _PublicGamesScreenState extends State<PublicGamesScreen> {
   void initState() {
     super.initState();
     // Fetch data once when the widget is created for better performance
-    _gamesFuture = _firestore.collection('games').orderBy('time', descending: true).get();
+    _gamesFuture = _firestore.collection('monthly_data').orderBy('time', descending: true).get();
   }
 
   void _refreshData() {
     setState(() {
-      _gamesFuture = _firestore.collection('games').orderBy('time', descending: true).get();
+      _gamesFuture = _firestore.collection('monthly_data').orderBy('time', descending: true).get();
     });
   }
 
