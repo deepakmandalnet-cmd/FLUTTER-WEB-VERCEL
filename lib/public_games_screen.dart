@@ -11,18 +11,18 @@ class PublicGamesScreen extends StatefulWidget {
 
 class _PublicGamesScreenState extends State<PublicGamesScreen> {
   final _firestore = FirebaseFirestore.instance;
-  late Future<QuerySnapshot> _gamesFuture;
+  late Future<QuerySnapshot> _dataFuture;
 
   @override
   void initState() {
     super.initState();
     // Fetch data once when the widget is created for better performance
-    _gamesFuture = _firestore.collection('monthly_data').orderBy('time', descending: true).get();
+    _dataFuture = _firestore.collection('monthly_data').orderBy('time', descending: true).get();
   }
 
   void _refreshData() {
     setState(() {
-      _gamesFuture = _firestore.collection('monthly_data').orderBy('time', descending: true).get();
+      _dataFuture = _firestore.collection('monthly_data').orderBy('time', descending: true).get();
     });
   }
 
@@ -30,7 +30,7 @@ class _PublicGamesScreenState extends State<PublicGamesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Game Results'),
+        title: const Text('Monthly Data'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -40,9 +40,13 @@ class _PublicGamesScreenState extends State<PublicGamesScreen> {
         ],
       ),
       body: FutureBuilder<QuerySnapshot>(
-        future: _gamesFuture,
+        future: _dataFuture,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
+            // More specific error for Firestore permission issues
+            if (snapshot.error.toString().contains('PERMISSION_DENIED')) {
+              return const Center(child: Text('Error: Could not access data. Please check Firestore security rules.'));
+            }
             return Center(child: Text('Something went wrong: ${snapshot.error}'));
           }
 
@@ -51,7 +55,7 @@ class _PublicGamesScreenState extends State<PublicGamesScreen> {
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('No game results found.'));
+            return const Center(child: Text('No data found for this month.'));
           }
 
           final docs = snapshot.data!.docs;
@@ -68,7 +72,6 @@ class _PublicGamesScreenState extends State<PublicGamesScreen> {
                     columnSpacing: 38.0,
                     headingRowColor: WidgetStateProperty.resolveWith<Color?>(
                       (Set<WidgetState> states) {
-                        // Using a non-deprecated way to set color with opacity
                         return Theme.of(context).colorScheme.primary.withAlpha(25); // roughly 10% opacity
                       },
                     ),
@@ -80,7 +83,7 @@ class _PublicGamesScreenState extends State<PublicGamesScreen> {
                     rows: docs.map((doc) {
                       final data = doc.data() as Map<String, dynamic>? ?? {};
                       final timestamp = data['time'] as Timestamp?;
-                      final timeString = timestamp != null 
+                      final timeString = timestamp != null
                           ? TimeOfDay.fromDateTime(timestamp.toDate()).format(context)
                           : 'N/A';
 
