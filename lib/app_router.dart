@@ -1,65 +1,77 @@
 
+import 'dart:async'; // Import async library for StreamSubscription
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'login_screen.dart';
 import 'admin_screen.dart';
+import 'public_games_screen.dart'; // Import the new public screen
 
-// 1. Auth Provider
-class AuthProvider with ChangeNotifier {
-  User? _user;
-  User? get user => _user;
-
-  AuthProvider() {
-    // Listen to authentication state changes
-    FirebaseAuth.instance.authStateChanges().listen((user) {
-      _user = user;
-      notifyListeners(); // Notify listeners (like GoRouter) of the change
-    });
-  }
-
-  bool get isLoggedIn => _user != null;
-}
-
-// 2. GoRouter Configuration
 class AppRouter {
-  final AuthProvider authProvider;
-  late final GoRouter router;
+  final GoRouter router;
 
-  AppRouter(this.authProvider) {
-    router = GoRouter(
-      refreshListenable: authProvider, // Re-evaluates the route when auth state changes
-      initialLocation: '/admin', // Start at a protected route, redirect will handle it
+  AppRouter() : router = _createRouter();
+
+  static GoRouter _createRouter() {
+    return GoRouter(
+      initialLocation: '/', // Start at the public page
       routes: [
+        // Public route that everyone can see
         GoRoute(
-          name: 'login',
-          path: '/login',
-          builder: (context, state) => const LoginScreen(),
+          path: '/',
+          builder: (context, state) => const PublicGamesScreen(),
         ),
+        // Private route for the admin panel
         GoRoute(
-          name: 'admin',
           path: '/admin',
           builder: (context, state) => const AdminScreen(),
         ),
+        // Private route for the login page
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => const LoginScreen(),
+        ),
       ],
       redirect: (BuildContext context, GoRouterState state) {
-        final bool isLoggedIn = authProvider.isLoggedIn;
-        final bool isAtLoginPage = state.matchedLocation == '/login';
+        final bool loggedIn = FirebaseAuth.instance.currentUser != null;
+        final String location = state.uri.toString();
 
-        // If the user is not logged in and not trying to go to login, redirect them.
-        if (!isLoggedIn && !isAtLoginPage) {
-          return '/login';
+        // --- Security Logic ---
+
+        // If the user is NOT logged in and tries to access the admin page,
+        // redirect them to the public home page.
+        if (!loggedIn && location == '/admin') {
+          return '/'; // Redirect to public page, not login page
         }
 
-        // If the user is logged in and trying to go to the login page, redirect to admin.
-        if (isLoggedIn && isAtLoginPage) {
+        // If the user IS logged in and tries to access the login page,
+        // redirect them to the admin panel.
+        if (loggedIn && location == '/login') {
           return '/admin';
         }
 
-        // No redirect needed.
+        // No redirect needed
         return null;
       },
+      // This listener will automatically refresh the router when the auth state changes
+      refreshListenable: GoRouterRefreshStream(FirebaseAuth.instance.authStateChanges()),
     );
+  }
+}
+
+// This class is used to listen to Firebase auth changes and rebuild the router
+class GoRouterRefreshStream extends ChangeNotifier {
+  late final StreamSubscription<User?> _subscription;
+
+  GoRouterRefreshStream(Stream<User?> stream) {
+    notifyListeners();
+    _subscription = stream.listen((_) => notifyListeners());
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 }
