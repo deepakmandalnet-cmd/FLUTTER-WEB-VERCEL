@@ -1,22 +1,17 @@
 {
   "builds": [
     {
-      "src": "pubspec.yaml",
       "use": "@vercel/static-build",
+      "src": "build.sh",
       "config": {
-        "installCommand": "if [ -f \"pubspec.lock\" ]; then rm pubspec.lock; fi && flutter pub get",
-        "buildCommand": "flutter build web --release",
-        "outputDirectory": "build/web"
+        "distDir": "build/web"
       }
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
